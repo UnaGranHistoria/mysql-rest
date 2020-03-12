@@ -41,6 +41,55 @@ userModel.insertUser = (userData, callback) => {
             }
         )
     }
-}
+};
+
+userModel.updateUser = (userData, callback) => {
+    if (connection) {
+        const sql = `
+            UPDATE users SET
+            username = ${connection.escape(userData.username)},
+            password = ${connection.escape(userData.password)},
+            email = ${connection.escape(userData.email)}
+            WHERE id = ${connection.escape(userData.id)}
+        `
+        connection.query(sql, (err, result) => {
+            if (err) {
+                throw err;
+            } else {
+                callback(null, {
+                    'msg': 'success'
+                });
+            }
+        });
+    }
+};
+
+userModel.deleteUser = (id, callback) => {
+    if (connection) {
+        let sql = `
+            SELECT * FROM users WHERE id = ${connection.escape(id)}
+        `;
+        connection.query(sql, (err, row) => {
+            if (row) {
+                let sql = `
+                    DELETE FROM users WHERE id = ${id}
+                `;
+                connection.query(sql, (err, result) => {
+                    if (err) {
+                        throw err;
+                    } else {
+                        callback(null, {
+                            msg: 'deleted'
+                        })
+                    }
+                })
+            } else {
+                callback(null, {
+                    msg: 'not exists'
+                })
+            }
+        })
+    }
+};
 
 module.exports = userModel;
